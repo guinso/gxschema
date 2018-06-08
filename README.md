@@ -9,7 +9,7 @@ Data validation tool, a simplified version of XML schema.
 ### Schema (XML)
 ```xml
 <?xml version="1.0"?>
-<dxdoc name="order" revision="3">
+<dxdoc name="order" revision="3" id="8">
     <dxstr name="order number" lenLimit="7"></dxstr>
     <dxint name="qty"></dxint>
     <dxdecimal name="rate" precision="2"></dxdecimal>
@@ -45,11 +45,11 @@ Data validation tool, a simplified version of XML schema.
 ```
 
 ## Example 1
-load schema definition from XML and input data from JSON string
+validate data by loading schema definition from XML and input data from JSON string
 ```go
 //define XML schema
 defRaw := `
-<dxdoc name="invoice" revision="1">
+<dxdoc name="invoice" revision="1" id="7">
     <dxstr name="invNo"></dxstr>
     <dxint name="totalQty" isOptional="true"></dxint>
     <dxdecimal name="price" precision="2"></dxdecimal>
@@ -84,12 +84,13 @@ if validateErr != nil {
 ```
 
 ## Example 2
-Direct define definition and input data
+Validate data by direct define definition and input data
 ```go
 //define definition
 dxdoc := document.DxDoc{
     Name:     "invoice",
     Revision: 1,
+    ID: 7,
     Items: []document.DxItem{
         document.DxStr{Name: "invNo", EnableLenLimit: true, LenLimit: 4},
         document.DxInt{Name: "totalQty", IsOptional: true},

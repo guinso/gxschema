@@ -11,13 +11,16 @@ import (
 //DxDoc Document schema
 type DxDoc struct {
 	Name     string   //Name document name
+	ID       int      //ID document unique identifier
 	Revision int      //Revision document revision, each changes of document structure revision value shall increament by 1
 	Items    []DxItem //Items document contents, each item represent single field of document
 }
 
 //XML generate document definition into XML format
 func (doc DxDoc) XML() (string, error) {
-	result := fmt.Sprintf("<?xml version=\"1.0\"?>\n<dxdoc name=\"%s\" revision=\"%d\">", doc.Name, doc.Revision)
+	result := fmt.Sprintf(
+		"<?xml version=\"1.0\"?>\n<dxdoc name=\"%s\" revision=\"%d\" id=\"%d\">",
+		doc.Name, doc.Revision, doc.ID)
 
 	for _, item := range doc.Items {
 		result += "\n" + item.XML(1)

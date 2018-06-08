@@ -152,6 +152,9 @@ func walkDxDoc(root *XMLNode) (*DxDoc, error) {
 	hasName := false
 	name := ""
 
+	hasID := false
+	id := 0
+
 	for _, attribute := range root.Attributes {
 		//check revision attribute
 		if isAttributeNameMatch(&attribute, "revision") {
@@ -167,6 +170,15 @@ func walkDxDoc(root *XMLNode) (*DxDoc, error) {
 			name = attribute.Value
 			hasName = true
 		}
+
+		if isAttributeNameMatch(&attribute, "id") {
+			id, err = parseAttributeInt(&attribute)
+			if err != nil {
+				return nil, fmt.Errorf("<dxdoc> tag %s", err.Error())
+			}
+
+			hasID = true
+		}
 	}
 
 	if !hasRevision {
@@ -177,8 +189,12 @@ func walkDxDoc(root *XMLNode) (*DxDoc, error) {
 		return nil, fmt.Errorf("missing attribute 'name'")
 	}
 
+	if !hasID {
+		return nil, fmt.Errorf("missing attribute 'id'")
+	}
+
 	//must has attribute 'revision', 'name' and child node(s) 'items'
-	return &DxDoc{Revision: revision, Name: name, Items: nil}, nil
+	return &DxDoc{Revision: revision, Name: name, ID: id, Items: nil}, nil
 }
 
 func walkDxBool(node *XMLNode) (*DxBool, error) {

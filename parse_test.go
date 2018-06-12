@@ -7,7 +7,7 @@ import (
 
 func TestWalkDxDoc(t *testing.T) {
 	rawXML := `<?xml version="1.0"?>
-	<dxdoc name="invoice" revision="3" id="4">
+	<dxdoc name="invoice" revision="3" id="733bee1b-f79a-4cb7-b675-842317b994b5">
 		<dxint name="age"></dxint>
 		<dxdecimal name="price" precision="2"></dxdecimal>
 		<dxstr name="createdBy" isOptional="false"></dxstr>
@@ -30,8 +30,8 @@ func TestWalkDxDoc(t *testing.T) {
 		t.Errorf("expect revision value is 3 but get %d instead", dx.Revision)
 	}
 
-	if dx.ID != 4 {
-		t.Errorf("expect ID value is 4 but get %d instead", dx.ID)
+	if strings.Compare(dx.ID, "733bee1b-f79a-4cb7-b675-842317b994b5") != 0 {
+		t.Errorf("expect ID value is 733bee1b-f79a-4cb7-b675-842317b994b5 but get %s instead", dx.ID)
 	}
 
 	if strings.Compare(dx.Name, "invoice") != 0 {

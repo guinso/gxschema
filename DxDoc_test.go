@@ -9,7 +9,7 @@ func TestXML(t *testing.T) {
 	doc := DxDoc{
 		Name:     "invoice",
 		Revision: 3,
-		ID:       1,
+		ID:       "733bee1b-f79a-4cb7-b675-842317b994b5",
 		Items: []DxItem{
 			DxDecimal{Name: "total", Precision: 2},
 			DxStr{Name: "doc no", LenLimit: 6},
@@ -27,7 +27,7 @@ func TestXML(t *testing.T) {
 	}
 
 	expectedXML := `<?xml version="1.0"?>
-<dxdoc name="invoice" revision="3" id="1">
+<dxdoc name="invoice" revision="3" id="733bee1b-f79a-4cb7-b675-842317b994b5">
 	<dxdecimal name="total" precision="2"></dxdecimal>
 	<dxstr name="doc no"></dxstr>
 	<dxsection name="items" isArray="true">

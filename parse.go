@@ -153,7 +153,7 @@ func walkDxDoc(root *XMLNode) (*DxDoc, error) {
 	name := ""
 
 	hasID := false
-	id := 0
+	var id string
 
 	for _, attribute := range root.Attributes {
 		//check revision attribute
@@ -172,11 +172,7 @@ func walkDxDoc(root *XMLNode) (*DxDoc, error) {
 		}
 
 		if isAttributeNameMatch(&attribute, "id") {
-			id, err = parseAttributeInt(&attribute)
-			if err != nil {
-				return nil, fmt.Errorf("<dxdoc> tag %s", err.Error())
-			}
-
+			id = attribute.Value
 			hasID = true
 		}
 	}

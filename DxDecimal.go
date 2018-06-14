@@ -20,6 +20,9 @@ func (item DxDecimal) GetName() string { return item.Name }
 //IsValueOptional is field value optional
 func (item DxDecimal) IsValueOptional() bool { return item.IsOptional }
 
+//IsValueArray is field value allow to store multiple values
+func (item DxDecimal) IsValueArray() bool { return item.IsArray }
+
 //XML generate XML
 func (item DxDecimal) XML(indentLevel int) string {
 	var result string

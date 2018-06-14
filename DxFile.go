@@ -21,6 +21,9 @@ func (item DxFile) GetName() string { return item.Name }
 //IsValueOptional is field value optional
 func (item DxFile) IsValueOptional() bool { return item.IsOptional }
 
+//IsValueArray is field value allow to store multiple values
+func (item DxFile) IsValueArray() bool { return item.IsArray }
+
 //XML generate definitino into XML format
 func (item DxFile) XML(indentLevel int) string {
 	var result string

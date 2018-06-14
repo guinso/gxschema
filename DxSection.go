@@ -19,6 +19,9 @@ func (item DxSection) GetName() string { return item.Name }
 //IsValueOptional is field value optional
 func (item DxSection) IsValueOptional() bool { return item.IsOptional }
 
+//IsValueArray is field value allow to store multiple values
+func (item DxSection) IsValueArray() bool { return item.IsArray }
+
 //XML generate XML
 func (item DxSection) XML(indentLevel int) string {
 	var indent string

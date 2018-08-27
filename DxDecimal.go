@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+
+	"github.com/shopspring/decimal"
 )
 
 //DxDecimal floating point data type
@@ -52,43 +54,62 @@ func (item DxDecimal) ValidateData(input map[string]interface{}, name string) er
 		}
 
 		return nil
+	} else if rawValue == nil && item.IsOptional {
+		return nil
 	}
 
 	if item.IsArray {
-		arrFloat, arrOK := rawValue.([]float64)
-		if arrOK {
+		if arrFloat, arrOK := rawValue.([]float64); arrOK {
 			for index, value := range arrFloat {
-				if err := item.validateFloat(value, fmt.Sprintf("%s[%d]", name, index)); err != nil {
+				if err := item.validateFloat(value,
+					fmt.Sprintf("%s[%d]", name, index)); err != nil {
 					return err
 				}
 			}
 
 			return nil
-		}
-
-		arrObj, arrObjOK := rawValue.([]interface{})
-		if arrObjOK {
-			for index, rawValue := range arrObj {
-				value, floatOK := rawValue.(float64)
-				if floatOK {
-					if err := item.validateFloat(value, fmt.Sprintf("%s[%d]", name, index)); err != nil {
-						return err
-					}
+		} else if arrDecimal, arrOK := rawValue.([]decimal.Decimal); arrOK {
+			for index, value := range arrDecimal {
+				if err := item.validateShopSpringDecimal(value,
+					fmt.Sprintf("%s[%d]", name, index)); err != nil {
+					return err
 				}
 			}
 
 			return nil
+		} else if arrObj, arrObjOK := rawValue.([]interface{}); arrObjOK {
+
+			for index, rawValue := range arrObj {
+				if value, floatOK := rawValue.(float64); floatOK {
+					if err := item.validateFloat(value, fmt.Sprintf("%s[%d]", name, index)); err != nil {
+						return err
+					}
+				} else if value, shopspringDecimalOK := rawValue.(decimal.Decimal); shopspringDecimalOK {
+					if err := item.validateShopSpringDecimal(value, fmt.Sprintf("%s[%d]", name, index)); err != nil {
+						return err
+					}
+				} else {
+					return fmt.Errorf("%s[%d] is not decimal but %s", name, index, reflect.TypeOf(rawValue))
+				}
+			}
+
+			return nil
+		} else if value, floatOK := rawValue.(float64); floatOK {
+			return item.validateFloat(value, name)
+		} else if value, shopspringDecimalOK := rawValue.(decimal.Decimal); shopspringDecimalOK {
+			return item.validateShopSpringDecimal(value, name)
 		}
 
-		return fmt.Errorf("%s is not array boolean but %s", name, reflect.TypeOf(rawValue))
+		return fmt.Errorf("%s is not array decimal but %s", name, reflect.TypeOf(rawValue))
 	}
 
-	value, floatOK := rawValue.(float64)
-	if floatOK {
+	if value, floatOK := rawValue.(float64); floatOK {
 		return item.validateFloat(value, name)
+	} else if value, shopspringDecimalOK := rawValue.(decimal.Decimal); shopspringDecimalOK {
+		return item.validateShopSpringDecimal(value, name)
 	}
 
-	return fmt.Errorf("%s is not floating number but %s", name, reflect.TypeOf(rawValue))
+	return fmt.Errorf("%s is not decimal but %s", name, reflect.TypeOf(rawValue))
 }
 
 func (item DxDecimal) validateFloat(value float64, name string) error {
@@ -101,6 +122,16 @@ func (item DxDecimal) validateFloat(value float64, name string) error {
 	if _, residue := math.Modf(newValue); residue != 0 {
 		return fmt.Errorf("%s has invalid precision, expected %d: %f",
 			name, item.Precision, value)
+	}
+
+	return nil
+}
+
+func (item DxDecimal) validateShopSpringDecimal(value decimal.Decimal, name string) error {
+	precision := value.Exponent() * -1
+
+	if precision > int32(item.Precision) {
+		return fmt.Errorf("%s has invalid precision, expected %d: %s", name, item.Precision, value.String())
 	}
 
 	return nil

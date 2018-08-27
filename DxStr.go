@@ -56,6 +56,8 @@ func (item DxStr) ValidateData(input map[string]interface{}, name string) error 
 		}
 
 		return nil
+	} else if rawValue == nil && item.IsOptional {
+		return nil
 	}
 
 	if item.IsArray {

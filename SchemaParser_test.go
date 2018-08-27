@@ -20,7 +20,7 @@ func TestWalkDxDoc(t *testing.T) {
 		</dxsection>
 	</dxdoc>`
 
-	dx, dxErr := DecodeDxXML(rawXML)
+	dx, dxErr := ParseSchemaFromXML(rawXML)
 	if dxErr != nil {
 		t.Error(dxErr)
 		return

@@ -57,8 +57,8 @@ func (e *XMLNode) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
 	}, start)
 }
 
-//DecodeDxXML decode Dx from XML
-func DecodeDxXML(rawXML string) (*DxDoc, error) {
+//ParseSchemaFromXML parse document schema (DxDoc) from XML string
+func ParseSchemaFromXML(rawXML string) (*DxDoc, error) {
 	var n XMLNode
 
 	marshallErr := xml.Unmarshal([]byte(rawXML), &n)
@@ -68,7 +68,7 @@ func DecodeDxXML(rawXML string) (*DxDoc, error) {
 
 	dxdoc, errr := walkDxDoc(&n)
 	if errr != nil {
-		return nil, fmt.Errorf("failed to parse dxdoc: %s", errr.Error())
+		return nil, fmt.Errorf("failed to schema dxdoc: %s", errr.Error())
 	}
 
 	//traval all sub XML nodes

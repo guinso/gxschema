@@ -50,6 +50,8 @@ func (item DxBool) ValidateData(input map[string]interface{}, name string) error
 		}
 
 		return nil
+	} else if rawValue == nil && item.IsOptional {
+		return nil
 	}
 
 	if item.IsArray {
@@ -68,6 +70,8 @@ func (item DxBool) ValidateData(input map[string]interface{}, name string) error
 				}
 			}
 
+			return nil
+		} else if _, intOK := rawValue.(bool); intOK {
 			return nil
 		}
 

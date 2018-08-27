@@ -51,6 +51,8 @@ func (item DxInt) ValidateData(input map[string]interface{}, name string) error 
 		}
 
 		return nil
+	} else if rawValue == nil && item.IsOptional {
+		return nil
 	}
 
 	if item.IsArray {
@@ -59,18 +61,14 @@ func (item DxInt) ValidateData(input map[string]interface{}, name string) error 
 			return nil
 		}
 
-		arrFloat, arrFloatOK := rawValue.([]float64)
-		if arrFloatOK {
+		if arrFloat, arrFloatOK := rawValue.([]float64); arrFloatOK {
 			for index, tmp := range arrFloat {
 				if _, x2 := math.Modf(tmp); x2 != 0 {
 					return fmt.Errorf("%s[%d] is not int value: %f", name, index, tmp)
 				}
 			}
 			return nil
-		}
-
-		arrObj, arrObjOK := rawValue.([]interface{})
-		if arrObjOK {
+		} else if arrObj, arrObjOK := rawValue.([]interface{}); arrObjOK {
 			for index, tmp := range arrObj {
 				if _, ok := tmp.(int); ok {
 					continue
@@ -88,18 +86,23 @@ func (item DxInt) ValidateData(input map[string]interface{}, name string) error 
 			}
 
 			return nil
+		} else if _, intOK := rawValue.(int); intOK {
+			return nil
+		} else if tmpFloat, floatOK := rawValue.(float64); floatOK {
+			_, x2 := math.Modf(tmpFloat)
+			if x2 == 0 {
+				return nil
+			}
+
+			return fmt.Errorf("%s is not int value: %f", name, x2)
 		}
 
 		return fmt.Errorf("input value is not array int but %s", reflect.TypeOf(rawValue))
 	}
 
-	_, intOK := rawValue.(int)
-	if intOK {
+	if _, intOK := rawValue.(int); intOK {
 		return nil
-	}
-
-	tmpFloat, floatOK := rawValue.(float64)
-	if floatOK {
+	} else if tmpFloat, floatOK := rawValue.(float64); floatOK {
 		_, x2 := math.Modf(tmpFloat)
 		if x2 == 0 {
 			return nil

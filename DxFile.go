@@ -53,6 +53,8 @@ func (item DxFile) ValidateData(input map[string]interface{}, name string) error
 		}
 
 		return nil
+	} else if rawValue == nil && item.IsOptional {
+		return nil
 	}
 
 	if item.IsArray {
@@ -76,18 +78,18 @@ func (item DxFile) ValidateData(input map[string]interface{}, name string) error
 			}
 
 			return nil
+		} else if interfaceMap, interfaceMapOK := rawValue.(map[string]interface{}); interfaceMapOK {
+			return item.validateNode(interfaceMap, name)
+		} else if strMap, strMapOK := rawValue.(map[string]string); strMapOK {
+			return item.validateNodeV2(strMap, name)
 		}
 
 		return fmt.Errorf("%s is not array map but %s", name, reflect.TypeOf(rawValue))
 	}
 
-	interfaceMap, interfaceMapOK := rawValue.(map[string]interface{})
-	if interfaceMapOK {
+	if interfaceMap, interfaceMapOK := rawValue.(map[string]interface{}); interfaceMapOK {
 		return item.validateNode(interfaceMap, name)
-	}
-
-	strMap, strMapOK := rawValue.(map[string]string)
-	if strMapOK {
+	} else if strMap, strMapOK := rawValue.(map[string]string); strMapOK {
 		return item.validateNodeV2(strMap, name)
 	}
 

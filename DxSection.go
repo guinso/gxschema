@@ -57,6 +57,8 @@ func (item DxSection) ValidateData(input map[string]interface{}, name string) er
 		}
 
 		return nil
+	} else if rawValue == nil && item.IsOptional {
+		return nil
 	}
 
 	if item.IsArray {

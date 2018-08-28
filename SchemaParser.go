@@ -71,7 +71,7 @@ func ParseSchemaFromXML(rawXML string) (*DxDoc, error) {
 		return nil, fmt.Errorf("failed to schema dxdoc: %s", errr.Error())
 	}
 
-	//traval all sub XML nodes
+	//travel all sub XML nodes
 	for index, node := range n.Nodes {
 		if strings.Compare(node.XMLName.Local, "dxbool") == 0 {
 			dxbool, boolErr := walkDxBool(&node)

@@ -175,3 +175,52 @@ func TestValidateDataFromXML(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateDataFromJSON(t *testing.T) {
+	docSchema := &DxDoc{
+		Name:     "book",
+		Revision: 1,
+		Items: []DxItem{
+			DxStr{
+				Name:       "author",
+				IsOptional: false,
+			},
+			DxInt{
+				Name:       "year",
+				IsOptional: false,
+			},
+			DxDecimal{
+				Name:       "price",
+				IsOptional: false,
+				IsArray:    true,
+				Precision:  2,
+			},
+		},
+	}
+
+	type args struct {
+		dataJSON  string
+		docSchema *DxDoc
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "normal test",
+			args: args{
+				dataJSON:  `{"author":"John", "year":1996, "price":[1.23,4.07]}`,
+				docSchema: docSchema,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := ValidateDataFromJSON(tt.args.dataJSON, tt.args.docSchema); (err != nil) != tt.wantErr {
+				t.Errorf("ValidateDataFromJSON() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

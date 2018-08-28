@@ -1,6 +1,7 @@
 package gxschema
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"strconv"
@@ -71,4 +72,16 @@ func parseMapInterfaceFromXMLNode(node *XMLNode) map[string]interface{} {
 	}
 
 	return inputData
+}
+
+//ValidateDataFromJSON validate data based on JSON string
+func ValidateDataFromJSON(dataJSON string, docSchema *DxDoc) error {
+	rawMap := make(map[string]interface{})
+
+	parseErr := json.Unmarshal([]byte(dataJSON), &rawMap)
+	if parseErr != nil {
+		return fmt.Errorf("Failed to parse JSON string: %s", parseErr.Error())
+	}
+
+	return docSchema.ValidateData(rawMap)
 }

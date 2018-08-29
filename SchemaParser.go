@@ -3,9 +3,13 @@ package gxschema
 import (
 	"encoding/xml"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 )
+
+var preservedPropertyNames = [4]string{"id", "parent_id", "filename", "filepath"}
+var propertyNamePattern = regexp.MustCompile(`^[_a-zA-Z][a-zA-Z0-9_\-]*$`)
 
 //XMLNode raw XML node definition
 //source: https://github.com/golang/go/issues/3633
@@ -167,6 +171,10 @@ func walkDxDoc(root *XMLNode) (*DxDoc, error) {
 		}
 
 		if isAttributeNameMatch(&attribute, "name") {
+			if err := validatePropertyName(attribute.Value); err != nil {
+				return nil, err
+			}
+
 			name = attribute.Value
 			hasName = true
 		}
@@ -204,6 +212,10 @@ func walkDxBool(node *XMLNode) (*DxBool, error) {
 
 	for _, attribute := range node.Attributes {
 		if isAttributeNameMatch(&attribute, "name") {
+			if err := validatePropertyName(attribute.Value); err != nil {
+				return nil, err
+			}
+
 			name = attribute.Value
 			hasName = true
 		}
@@ -241,6 +253,10 @@ func walkDxInt(node *XMLNode) (*DxInt, error) {
 
 	for _, attribute := range node.Attributes {
 		if isAttributeNameMatch(&attribute, "name") {
+			if err := validatePropertyName(attribute.Value); err != nil {
+				return nil, err
+			}
+
 			name = attribute.Value
 			hasName = true
 		}
@@ -281,6 +297,10 @@ func walkDxDecimal(node *XMLNode) (*DxDecimal, error) {
 
 	for _, attribute := range node.Attributes {
 		if isAttributeNameMatch(&attribute, "name") {
+			if err := validatePropertyName(attribute.Value); err != nil {
+				return nil, err
+			}
+
 			name = attribute.Value
 			hasName = true
 		}
@@ -334,6 +354,10 @@ func walkDxStr(node *XMLNode) (*DxStr, error) {
 
 	for _, attribute := range node.Attributes {
 		if isAttributeNameMatch(&attribute, "name") {
+			if err := validatePropertyName(attribute.Value); err != nil {
+				return nil, err
+			}
+
 			name = attribute.Value
 			hasName = true
 		}
@@ -380,6 +404,10 @@ func walkDxSection(node *XMLNode, xmlPath string) (*DxSection, string, error) {
 
 	for _, attribute := range node.Attributes {
 		if isAttributeNameMatch(&attribute, "name") {
+			if err := validatePropertyName(attribute.Value); err != nil {
+				return nil, "", err
+			}
+
 			name = attribute.Value
 			hasName = true
 		}
@@ -466,6 +494,10 @@ func walkDxFile(node *XMLNode) (*DxFile, error) {
 
 	for _, attribute := range node.Attributes {
 		if isAttributeNameMatch(&attribute, "name") {
+			if err := validatePropertyName(attribute.Value); err != nil {
+				return nil, err
+			}
+
 			name = attribute.Value
 			hasName = true
 		}
@@ -518,4 +550,24 @@ func parseAttributeBool(attr *xml.Attr) (bool, error) {
 
 func isAttributeNameMatch(attr *xml.Attr, name string) bool {
 	return strings.Compare(attr.Name.Local, name) == 0
+}
+
+func validatePropertyName(propertyName string) error {
+	//validate is clash with preserved keyword or not
+	for _, keyword := range preservedPropertyNames {
+		if strings.Compare(keyword, strings.ToLower(propertyName)) == 0 {
+			return fmt.Errorf("'%s' is preserved keyword, please avoid %v",
+				propertyName, preservedPropertyNames)
+		}
+	}
+
+	//validate string pattern
+	if !propertyNamePattern.MatchString(propertyName) {
+		return fmt.Errorf("'%s' is not a valid property name, "+
+			"first charactor must begin with letter or underscore; "+
+			"no white scpace or symbols allowed",
+			propertyName)
+	}
+
+	return nil
 }
